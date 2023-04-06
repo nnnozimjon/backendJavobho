@@ -13,7 +13,7 @@ Router.get('/api', RouteController.Welcome)
 Router.post('/api/auth/login', RequestLimiter, LoginController.login)
 Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
 Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
-Router.get('/api/user/profile/img/header/:image', GetImageController.profile)
+Router.get('/api/user/profile/img/header/:image', GetImageController.header)
 
 //login controller
 
