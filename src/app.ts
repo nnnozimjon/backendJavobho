@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express'
-import PassportMiddleware from './middleware'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import mysql from 'mysql'
@@ -18,10 +17,10 @@ App.use(cors())
 App.use(Router)
 
 const connectionData = {
-  host: env.HOST,
-  user: env.USERNAME,
-  password: env.PASSWORD,
-  database: env.DATABASE,
+  host: 'iamnozns.beget.tech',
+  user: 'iamnozns_javobho',
+  password: '@163425102100ismyPass',
+  database: 'iamnozns_javobho',
 }
 const con = mysql.createPool(connectionData)
 
@@ -33,4 +32,5 @@ con.getConnection(err => {
   }
 })
 
+export { con }
 export default App
