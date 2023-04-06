@@ -9,7 +9,7 @@ const Router = express.Router()
 
 Router.get('/', RouteController.home)
 Router.get('/api', RouteController.Welcome)
-Router.post('/login', LoginController.login)
+Router.post('/login', RequestLimiter, LoginController.login)
 Router.post('/register', RequestLimiter, RegisterController.register)
 //login controller
 

@@ -4,7 +4,7 @@ import {
   checkEmailAvailability,
   checkUsernameAvailability,
   createUser,
-} from './checks/UserExistance'
+} from './check/UserExistance'
 
 class RegisterController {
   static async register(req: Request, res: Response) {

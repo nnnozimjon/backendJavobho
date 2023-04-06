@@ -22,5 +22,22 @@ declare namespace IAuth {
     email: text
     password: text
   }
+
+  interface login {
+    username: text
+    password: text
+    robot: bool
+  }
+
+  interface payload {
+    userId: int
+    username: text
+    fullname: text
+    description: text
+    verified: bool
+    avatar: text
+    splashImage: text
+    createdAt: text
+  }
 }
 export default IAuth
