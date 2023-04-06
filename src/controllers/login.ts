@@ -3,6 +3,7 @@ import IAuth from './interfaces/auth.interface'
 import jwt from 'jsonwebtoken'
 import secret from '../validators'
 import { checkPassword, checkUser, getUserPayload } from './check/login'
+import { baseUrl } from '../utils/baseURL'
 class LoginController {
   static async login(req: Request, res: Response) {
     const { username, password, robot }: IAuth.login = req.body
@@ -39,9 +40,17 @@ class LoginController {
 
     const payload: IAuth.payload = await getUserPayload(username)
 
-    const token = await jwt.sign({ payload }, secret, {
-      expiresIn: '3d',
-    })
+    const token = await jwt.sign(
+      {
+        ...payload,
+        avatar: `${baseUrl}/api/user/profile/img/avatar/${payload.avatar}`,
+        splashImage: `${baseUrl}/api/user/profile/img/header/${payload.splashImage}`,
+      },
+      secret,
+      {
+        expiresIn: '3d',
+      }
+    )
 
     res.json({
       message: `Success`,

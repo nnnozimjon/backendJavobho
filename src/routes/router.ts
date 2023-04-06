@@ -4,13 +4,17 @@ import LoginController from '../controllers/login'
 import RegisterController from '../controllers/register'
 import RequestLimiter from '../middleware/RateLimit'
 import PassportMiddleware from '../middleware'
+import GetImageController from '../controllers/getImage'
 
 const Router = express.Router()
 
 Router.get('/', RouteController.home)
 Router.get('/api', RouteController.Welcome)
-Router.post('/login', RequestLimiter, LoginController.login)
-Router.post('/register', RequestLimiter, RegisterController.register)
+Router.post('/api/auth/login', RequestLimiter, LoginController.login)
+Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
+Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
+Router.get('/api/user/profile/img/header/:image', GetImageController.profile)
+
 //login controller
 
 //register controller
