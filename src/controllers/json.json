@@ -1,0 +1,40 @@
+{
+    "payload":[
+    {"postId":1,
+    "text":"Please Channel Subscribe at my guys!",
+    "image":null,
+    "type":"post",
+    "createdAt":"2023-04-06T10:54:48.000Z",
+    "comments":[
+        {
+            "commentId":1,
+            "text":"Wow good job!",
+            "createdAt":"2023-04-09T08:48:44.000Z",
+            "userId":5,
+            "username": "username",
+            "fullname": "name and surname",
+            "verified": 0,
+            "avatar": "default.png"
+
+        }
+        ],
+        "liked":false,
+        "likedUsers":[
+            {
+                "userId": 4,
+                "username": "username",
+                "fullname": "name and surname",
+                "verified": 0,
+                "avatar": "default.png"
+            },
+            {
+                "userId": 5,
+                "username": "username",
+                "fullname": "name and surname",
+                "verified": 1,
+                "avatar": "default.png"
+            }
+        ]
+        }
+    ]
+}

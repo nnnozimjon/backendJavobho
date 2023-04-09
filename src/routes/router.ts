@@ -5,15 +5,32 @@ import RegisterController from '../controllers/register'
 import RequestLimiter from '../middleware/RateLimit'
 import PassportMiddleware from '../middleware'
 import GetImageController from '../controllers/getImage'
+import GetHashTagsController from '../controllers/getHashTags'
+import GetFollowController from '../controllers/getFollow'
+import GetPostsController from '../controllers/getPosts'
 
 const Router = express.Router()
 
 Router.get('/', RouteController.home)
 Router.get('/api', RouteController.Welcome)
+
 Router.post('/api/auth/login', RequestLimiter, LoginController.login)
 Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
+
 Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
 Router.get('/api/user/profile/img/header/:image', GetImageController.header)
+Router.get(
+  '/api/user/explore/tags',
+  PassportMiddleware,
+  GetHashTagsController.tags
+)
+Router.get(
+  '/api/user/profile/follow/:userId',
+  PassportMiddleware,
+  GetFollowController.getFollowersAndFollowing
+)
+// get all user post
+Router.get('/api/user/get/posts/:userId', GetPostsController.getUserPosts)
 
 //login controller
 
