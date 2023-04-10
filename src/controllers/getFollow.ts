@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { con } from '../app'
 import { baseUrl } from '../utils/baseURL'
+import jwt from 'jsonwebtoken'
+import secret from '../validators'
 
 interface followers {
   userId: number
@@ -58,10 +60,22 @@ class GetFollowController {
     }
   }
   static async getFollowing(req: Request, res: Response) {}
-  static async postFollow(req: Request, res: Response) {
-    const { followerId, followingId } = req.body
 
+  static postFollow = async (req: Request, res: Response) => {
     try {
+      const token = await req.headers.authorization?.slice(7).replace(/"/g, '')
+      const decoded: any = jwt.verify(token as string & { exp: number }, secret)
+      const { userId }: any = decoded
+      const { followerId, followingId } = req.body
+
+      if (userId !== followerId) {
+        return res.sendStatus(401)
+      }
+
+      if (userId === followingId) {
+        return res.sendStatus(403)
+      }
+
       const sql = `INSERT INTO jvb_follow (followerId,followingId) VALUES(?,?)`
 
       const result: any = await new Promise((resolve, reject) => {
@@ -72,15 +86,18 @@ class GetFollowController {
           resolve(result)
         })
       })
+
       if (result.affectedRows > 0) {
-        res.json(200)
+        res.sendStatus(200)
       } else {
         res.sendStatus(501)
       }
     } catch (error) {
-      return res.sendStatus(501)
+      console.error(error)
+      res.sendStatus(501)
     }
   }
+
   static async postUnfollow(req: Request, res: Response) {
     const { followerId, followingId } = req.body
 

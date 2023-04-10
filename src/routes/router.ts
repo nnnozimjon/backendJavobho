@@ -31,7 +31,7 @@ Router.get(
 )
 Router.post(
   '/api/user/post/follow',
-  PassportMiddleware,
+  // PassportMiddleware,
   GetFollowController.postFollow
 )
 Router.post(
@@ -45,6 +45,8 @@ Router.get(
   PassportMiddleware,
   GetPostsController.getUserPosts
 )
+
+Router.get('/check/:userId', GetPostsController.getUserPosts)
 
 //login controller
 

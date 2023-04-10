@@ -1,99 +1,131 @@
 import { Request, Response } from 'express'
 import { con } from '../app'
+import { baseUrl } from '../utils/baseURL'
 
 class GetPostsController {
   static async getUserPosts(req: Request, res: Response) {
     const userId = req.params.userId
 
     try {
-      const sql = `
-      SELECT
-        jvb_posts.postId,
-        jvb_posts.text,
-        jvb_posts.image,
-        jvb_posts.type,
-        jvb_posts.status,
-        jvb_posts.createdAt,
-        COALESCE(likesCount.likesCount, 0) AS likesCount,
-        jvb_likes.userId AS likedBy,
-        jvb_comments.commentId,
-        jvb_comments.text AS commentText,
-        jvb_comments.userId AS commentedBy,
-        jvb_comments.createdAt AS commentCreatedAt,
-        jvb_users.userId,
-        jvb_users.username,
-        jvb_users.fullname,
-        jvb_users.verified,
-        jvb_users.avatar
-      FROM jvb_posts
-      LEFT JOIN (
-        SELECT objectId, type, COUNT(*) AS likesCount FROM jvb_likes GROUP BY objectId, type
-      ) AS likesCount ON jvb_posts.postId = likesCount.objectId AND jvb_posts.type = likesCount.type
-      LEFT JOIN jvb_likes ON jvb_posts.postId = jvb_likes.objectId AND jvb_posts.type = jvb_likes.type
-      LEFT JOIN jvb_comments ON jvb_posts.postId = jvb_comments.postId
-      JOIN jvb_users ON jvb_likes.userId = jvb_users.userId
-      WHERE jvb_posts.userId = ?
-    `
+      const postSql = `
+      SELECT jp.postId,
+      jp.text,
+      jp.image,
+      jp.type,
+      jp.status,
+      jp.createdAt,
+      jp.userId,
+      ju.verified,
+      ju.username,
+      ju.fullname,
+      ju.avatar
+      FROM jvb_posts jp
+      LEFT JOIN jvb_users ju ON jp.userId = ju.userId
+      WHERE jp.userId = ?;`
+
+      const commentSql = `SELECT commentId,
+      userId,
+      text as commentText,
+      createdAt,
+      postId
+      FROM jvb_comments
+      WHERE postId IN (?);`
+
+      const likesSql = `
+      SELECT likeID,
+      userId,
+      type,
+      objectId
+      from jvb_likes WHERE objectId IN  (?);`
+
+      const likedUsers = `SELECT
+      userId,
+      username,
+      verified,
+      fullname
+  from jvb_users WHERE userId in (?);`
 
       const posts: any[] = await new Promise((resolve, reject) => {
-        con.query(sql, userId, (err, result) => {
+        con.query(postSql, userId, (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
       })
 
-      const formattedResult = posts.reduce((acc: any, curr: any) => {
-        const post = acc.find((p: any) => p.postId === curr.postId)
-        const comment = curr.commentId
-          ? {
-              commentId: curr.commentId,
-              text: curr.commentText,
-              userId: curr.commentedBy,
-              createdAt: curr.commentCreatedAt,
-              username: curr.username,
-              fullname: curr.fullname,
-              verified: curr.verified,
-              avatar: curr.avatar,
-            }
-          : null
-        const likedUser = curr.likedBy
-          ? {
-              userId: curr.userId,
-              username: curr.username,
-              fullname: curr.fullname,
-              verified: curr.verified,
-              avatar: curr.avatar,
-            }
-          : null
+      // get all posts ids from posts
+      const postIds = await posts.map(post => {
+        return post.postId
+      })
 
-        if (!post) {
-          acc.push({
-            postId: curr.postId,
-            text: curr.text,
-            image: curr.image,
-            type: curr.type,
-            createdAt: curr.createdAt,
-            comments: comment ? [comment] : [],
-            liked: curr.likedBy == userId,
-            likesCount: curr.likesCount,
-            likedUsers: likedUser ? [likedUser] : [],
+      // get all comments with post ids
+      const comments: any[] = await new Promise((resolve, reject) => {
+        con.query(commentSql, [postIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
+      })
+
+      const likes: any[] = await new Promise((resolve, reject) => {
+        con.query(likesSql, [postIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
+      })
+
+      const likedIds = await likes.map(like => {
+        return like.userId
+      })
+
+      const AlllikedUsers: any[] = await new Promise((resolve, reject) => {
+        con.query(likedUsers, [likedIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
+      })
+
+      const formattedData = {
+        payload: posts.map(post => {
+          const postComments = comments.filter(
+            comment => comment.postId === post.postId
+          )
+          const postLikes = likes.filter(like => like.objectId === post.postId)
+          const postLikedByUser = postLikes.some(like => like.userId == userId)
+
+          const postLikedByUsers = postLikes.map(like => {
+            const user = AlllikedUsers.find(user => user.userId === like.userId)
+            return {
+              userId: user.userId,
+              username: user.username,
+              verified: user.verified,
+              fullname: user.fullname,
+            }
           })
-        } else {
-          if (comment) {
-            post.comments.push(comment)
-          }
-          if (curr.likedBy) {
-            post.likedUsers.push(likedUser)
-          }
-          if (curr.likedBy == userId) {
-            post.liked = true
-          }
-        }
 
-        return acc
-      }, [])
+          return {
+            postId: post.postId,
+            text: post.text,
+            image: post.image,
+            type: post.type,
+            status: post.status,
+            createdAt: post.createdAt,
+            userId: post.userId,
+            username: post.username,
+            fullname: post.fullname,
+            verified: post.verified,
+            avatar: baseUrl + '/api/user/profile/img/avatar/' + post.avatar,
+            likedByUser: postLikedByUser,
+            comments: postComments.map(comment => ({
+              userId: comment.userId,
+              text: comment.commentText,
+              createdAt: comment.createdAt,
+              postId: comment.postId,
+            })),
+            likedByUsers: postLikedByUsers,
+          }
+        }),
+      }
 
-      res.json({ payload: formattedResult })
+      res.json(formattedData)
     } catch (error) {
       res.sendStatus(501)
     }
