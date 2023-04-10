@@ -29,8 +29,22 @@ Router.get(
   PassportMiddleware,
   GetFollowController.getFollowersAndFollowing
 )
+Router.post(
+  '/api/user/post/follow',
+  PassportMiddleware,
+  GetFollowController.postFollow
+)
+Router.post(
+  '/api/user/post/unfollow',
+  PassportMiddleware,
+  GetFollowController.postUnfollow
+)
 // get all user post
-Router.get('/api/user/get/posts/:userId', GetPostsController.getUserPosts)
+Router.get(
+  '/api/user/get/posts/:userId',
+  PassportMiddleware,
+  GetPostsController.getUserPosts
+)
 
 //login controller
 

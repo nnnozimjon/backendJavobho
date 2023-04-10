@@ -6,7 +6,7 @@ const PassportMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization?.replace(/"/g, '') || ''
+  const token = req.headers.authorization?.slice(7).replace(/"/g, '') || ''
   if (!(await verifyToken(token))) {
     return res.sendStatus(401)
   }

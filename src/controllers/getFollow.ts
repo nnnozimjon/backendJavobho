@@ -15,31 +15,23 @@ class GetFollowController {
       const userId = req.params.userId
 
       const sqlFollowers = `SELECT userId, username, fullname, verified, avatar
-      FROM jvb_users
-      WHERE userId IN (
-        SELECT userId
-        FROM jvb_follow
-        WHERE followingId = ?
-      )
-      AND userId <> ?`
+      FROM jvb_follow jf
+            left join jvb_users ju on ju.userId = jf.followerId
+      where followingId=?`
       const sqlFollowing = `SELECT userId, username, fullname, verified, avatar
-      FROM jvb_users
-      WHERE userId IN (
-        SELECT userId
-        FROM jvb_follow
-        WHERE followerId = ?
-      )
-      AND userId <> ?`
+      FROM jvb_follow jf
+            left join jvb_users ju on ju.userId = jf.followingId
+      where followerId=?`
 
       const followers: followers[] = await new Promise((resolve, reject) => {
-        con.query(sqlFollowers, [userId, userId], (err, result) => {
+        con.query(sqlFollowers, userId, (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
       })
 
       const following: followers[] = await new Promise((resolve, reject) => {
-        con.query(sqlFollowing, [userId, userId], (err, result) => {
+        con.query(sqlFollowing, userId, (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
@@ -66,8 +58,52 @@ class GetFollowController {
     }
   }
   static async getFollowing(req: Request, res: Response) {}
-  static async postFollow(req: Request, res: Response) {}
-  static async postUnfollow(req: Request, res: Response) {}
+  static async postFollow(req: Request, res: Response) {
+    const { followerId, followingId } = req.body
+
+    try {
+      const sql = `INSERT INTO jvb_follow (followerId,followingId) VALUES(?,?)`
+
+      const result: any = await new Promise((resolve, reject) => {
+        con.query(sql, [followerId, followingId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+      if (result.affectedRows > 0) {
+        res.json(200)
+      } else {
+        res.sendStatus(501)
+      }
+    } catch (error) {
+      return res.sendStatus(501)
+    }
+  }
+  static async postUnfollow(req: Request, res: Response) {
+    const { followerId, followingId } = req.body
+
+    try {
+      const sql = `DELETE FROM jvb_follow WHERE followerId = ? AND followingId = ?`
+
+      const result: any = await new Promise((resolve, reject) => {
+        con.query(sql, [followerId, followingId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+      if (result.affectedRows > 0) {
+        res.json(200)
+      } else {
+        res.sendStatus(501)
+      }
+    } catch (error) {
+      return res.sendStatus(501)
+    }
+  }
 }
 
 export default GetFollowController
