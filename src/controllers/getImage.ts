@@ -29,6 +29,19 @@ class GetImageController {
       res.send(data)
     })
   }
+  static async posts(req: Request, res: Response) {
+    const image = req.params.image
+
+    fs.readFile(`src/assets/img/posts/${image}`, (err, data) => {
+      if (err) {
+        console.error(`Error reading file: ${err}`)
+        return res.status(500).send('Error reading file')
+      }
+      const contentType = GetImageController.getContentType(image)
+      res.setHeader('Content-Type', contentType)
+      res.send(data)
+    })
+  }
 
   private static getContentType(image: string): string {
     const extension = image.split('.').pop()?.toLowerCase()

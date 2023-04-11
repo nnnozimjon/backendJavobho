@@ -19,6 +19,7 @@ Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
 
 Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
 Router.get('/api/user/profile/img/header/:image', GetImageController.header)
+Router.get('/api/user/profile/posts/post/:image', GetImageController.posts)
 Router.get(
   '/api/user/explore/tags',
   PassportMiddleware,

@@ -107,10 +107,14 @@ class GetPostsController {
 
       // get all comments with post ids
       const comments: Comment[] = await new Promise((resolve, reject) => {
-        con.query(commentSql, [postIds], (err, result) => {
-          if (err) reject(err)
-          resolve(result)
-        })
+        con.query(
+          commentSql,
+          [postIds.length > 0 ? postIds : 0],
+          (err, result) => {
+            if (err) reject(err)
+            resolve(result)
+          }
+        )
       })
 
       const commentIds = await comments.map(comment => {
@@ -118,17 +122,25 @@ class GetPostsController {
       })
 
       const commentLikes: any[] = await new Promise((resolve, reject) => {
-        con.query(commentLikeSql, [commentIds], (err, result) => {
-          if (err) reject(err)
-          resolve(result)
-        })
+        con.query(
+          commentLikeSql,
+          [commentIds.length > 0 ? commentIds : 0],
+          (err, result) => {
+            if (err) reject(err)
+            resolve(result)
+          }
+        )
       })
 
       const likes: any[] = await new Promise((resolve, reject) => {
-        con.query(likesSql, [postIds], (err, result) => {
-          if (err) reject(err)
-          resolve(result)
-        })
+        con.query(
+          likesSql,
+          [postIds.length > 0 ? postIds : 0],
+          (err, result) => {
+            if (err) reject(err)
+            resolve(result)
+          }
+        )
       })
 
       const likedIds = await likes.map(like => {
@@ -136,10 +148,14 @@ class GetPostsController {
       })
 
       const AlllikedUsers: any[] = await new Promise((resolve, reject) => {
-        con.query(likedUsers, [likedIds], (err, result) => {
-          if (err) reject(err)
-          resolve(result)
-        })
+        con.query(
+          likedUsers,
+          [likedIds.length > 0 ? likedIds : 0],
+          (err, result) => {
+            if (err) reject(err)
+            resolve(result)
+          }
+        )
       })
 
       const formattedData = {
@@ -179,7 +195,7 @@ class GetPostsController {
           return {
             postId: post.postId,
             text: post.text,
-            image: post.image,
+            image: baseUrl + '/api/user/profile/posts/post/' + post.image,
             type: post.type,
             status: post.status,
             createdAt: post.createdAt,
