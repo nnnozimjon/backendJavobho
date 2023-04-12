@@ -8,6 +8,7 @@ import GetImageController from '../controllers/getImage'
 import GetHashTagsController from '../controllers/getHashTags'
 import GetFollowController from '../controllers/getFollow'
 import GetPostsController from '../controllers/getPosts'
+import PostController from '../controllers/postPost'
 
 const Router = express.Router()
 
@@ -20,6 +21,8 @@ Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
 Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
 Router.get('/api/user/profile/img/header/:image', GetImageController.header)
 Router.get('/api/user/profile/posts/post/:image', GetImageController.posts)
+Router.post('/api/user/upload/post', PostController.Post)
+
 Router.get(
   '/api/user/explore/tags',
   PassportMiddleware,

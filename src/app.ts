@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
 const App = express()
 
-App.use(express.json())
+App.use(express.json({ limit: '10mb' }))
 App.use(express.urlencoded({ extended: true }))
 App.use(cors())
 

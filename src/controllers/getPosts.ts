@@ -107,14 +107,10 @@ class GetPostsController {
 
       // get all comments with post ids
       const comments: Comment[] = await new Promise((resolve, reject) => {
-        con.query(
-          commentSql,
-          [postIds.length > 0 ? postIds : 0],
-          (err, result) => {
-            if (err) reject(err)
-            resolve(result)
-          }
-        )
+        con.query(commentSql, [postIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
       })
 
       const commentIds = await comments.map(comment => {
@@ -122,25 +118,17 @@ class GetPostsController {
       })
 
       const commentLikes: any[] = await new Promise((resolve, reject) => {
-        con.query(
-          commentLikeSql,
-          [commentIds.length > 0 ? commentIds : 0],
-          (err, result) => {
-            if (err) reject(err)
-            resolve(result)
-          }
-        )
+        con.query(commentLikeSql, [commentIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
       })
 
       const likes: any[] = await new Promise((resolve, reject) => {
-        con.query(
-          likesSql,
-          [postIds.length > 0 ? postIds : 0],
-          (err, result) => {
-            if (err) reject(err)
-            resolve(result)
-          }
-        )
+        con.query(likesSql, [postIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
       })
 
       const likedIds = await likes.map(like => {
@@ -148,17 +136,14 @@ class GetPostsController {
       })
 
       const AlllikedUsers: any[] = await new Promise((resolve, reject) => {
-        con.query(
-          likedUsers,
-          [likedIds.length > 0 ? likedIds : 0],
-          (err, result) => {
-            if (err) reject(err)
-            resolve(result)
-          }
-        )
+        con.query(likedUsers, [likedIds], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
       })
 
       const formattedData = {
+        message: 'success',
         payload: posts.map(post => {
           const postComments = comments.filter(
             comment => comment.postId == post.postId
@@ -232,7 +217,7 @@ class GetPostsController {
       // res.json(commentLikes)
       res.json(formattedData)
     } catch (error) {
-      res.sendStatus(501)
+      res.json({ message: 'failed', error: error })
     }
   }
 
