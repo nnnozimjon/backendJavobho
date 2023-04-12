@@ -58,20 +58,22 @@ class GetPostsController {
       ju.avatar
       FROM jvb_posts jp
       LEFT JOIN jvb_users ju ON jp.userId = ju.userId
-      WHERE jp.userId = ?;`
+      WHERE jp.userId = ? AND jp.status = 'publish'
+      ORDER BY jp.createdAt DESC;`
 
       const commentSql = `SELECT jc.commentId,
       jc.userId,
       text as commentText,
       jc.createdAt,
       jc.postId,
+      jc.status,
       ju.username as commenterUsername,
       ju.verified as commenterVerified,
       ju.fullname as commenterFullname,
       ju.avatar as commenterAvatar
       FROM jvb_comments jc
       LEFT JOIN jvb_users ju ON ju.userId = jc.userId
-      WHERE postId IN (?)`
+      WHERE postId IN (?) AND jc.status = 'publish' ORDER BY jc.createdAt DESC;`
 
       const likesSql = `
       SELECT likeID,
@@ -180,7 +182,9 @@ class GetPostsController {
           return {
             postId: post.postId,
             text: post.text,
-            image: baseUrl + '/api/user/profile/posts/post/' + post.image,
+            image:
+              post.image &&
+              baseUrl + '/api/user/profile/posts/post/' + post.image,
             type: post.type,
             status: post.status,
             createdAt: post.createdAt,
@@ -188,7 +192,9 @@ class GetPostsController {
             username: post.username,
             fullname: post.fullname,
             verified: post.verified,
-            avatar: baseUrl + '/api/user/profile/img/avatar/' + post.avatar,
+            avatar:
+              post.avatar &&
+              baseUrl + '/api/user/profile/img/avatar/' + post.avatar,
             likedByUser: postLikedByUser,
             comments: postComments.map(comment => ({
               commentId: comment.commentId,
@@ -199,9 +205,10 @@ class GetPostsController {
               commenterVerified: comment.commenterVerified,
               commenterFullname: comment.commenterFullname,
               commenterAvatar:
+                comment.commenterAvatar &&
                 baseUrl +
-                '/api/user/profile/img/avatar/' +
-                comment.commenterAvatar,
+                  '/api/user/profile/img/avatar/' +
+                  comment.commenterAvatar,
               commentLikeCount: commentsLikes.find(
                 like => like.commentId === comment.commentId
               )?.commentLikeCount,
@@ -213,8 +220,6 @@ class GetPostsController {
           }
         }),
       }
-
-      // res.json(commentLikes)
       res.json(formattedData)
     } catch (error) {
       res.json({ message: 'failed', error: error })
