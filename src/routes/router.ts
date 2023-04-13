@@ -2,60 +2,59 @@ import express from 'express'
 import RouteController from '../controllers'
 import LoginController from '../controllers/login'
 import RegisterController from '../controllers/register'
-import RequestLimiter from '../middleware/RateLimit'
+import { RequestLimiter, PostRequestLimiter } from '../middleware/RateLimit'
 import PassportMiddleware from '../middleware'
 import GetImageController from '../controllers/getImage'
 import GetHashTagsController from '../controllers/getHashTags'
 import GetFollowController from '../controllers/getFollow'
 import GetPostsController from '../controllers/getPosts'
 import PostController from '../controllers/postPost'
+import { apiPaths } from '../contants/apiPaths'
 
 const Router = express.Router()
 
-Router.get('/', RouteController.home)
-Router.get('/api', RouteController.Welcome)
+Router.get(apiPaths.index, RouteController.home)
+Router.get(apiPaths.api, RouteController.Welcome)
 
-Router.post('/api/auth/login', RequestLimiter, LoginController.login)
-Router.post('/api/auth/register', RequestLimiter, RegisterController.register)
+Router.post(apiPaths.login, RequestLimiter, LoginController.login)
+Router.post(apiPaths.register, RequestLimiter, RegisterController.register)
 
-Router.get('/api/user/profile/img/avatar/:image', GetImageController.profile)
-Router.get('/api/user/profile/img/header/:image', GetImageController.header)
-Router.get('/api/user/profile/posts/post/:image', GetImageController.posts)
-Router.post('/api/user/upload/post', PostController.Post)
-
+Router.get(apiPaths.getProfileAvatarImage, GetImageController.profile)
+Router.get(apiPaths.getProfileHeaderImage, GetImageController.header)
+Router.get(apiPaths.getPostsImage, GetImageController.posts)
+Router.post(apiPaths.postUploadPost, PostRequestLimiter, PostController.Post)
 Router.get(
-  '/api/user/explore/tags',
+  apiPaths.getExploreTags,
   PassportMiddleware,
   GetHashTagsController.tags
 )
 Router.get(
-  '/api/user/profile/follow/:userId',
+  apiPaths.getUserFollowersAndFollowings,
   PassportMiddleware,
   GetFollowController.getFollowersAndFollowing
 )
 Router.post(
-  '/api/user/post/follow',
-  // PassportMiddleware,
+  apiPaths.postFollowUser,
+  [PassportMiddleware, PostRequestLimiter],
   GetFollowController.postFollow
 )
 Router.post(
-  '/api/user/post/unfollow',
-  PassportMiddleware,
+  apiPaths.postUnfollowUser,
+  [PassportMiddleware, PostRequestLimiter],
   GetFollowController.postUnfollow
 )
-// get all user post
 Router.get(
-  '/api/user/get/posts/:userId',
+  apiPaths.getUserPosts,
   PassportMiddleware,
   GetPostsController.getUserPosts
 )
 
 Router.get('/check/:userId', GetPostsController.getUserPosts)
 
-//login controller
-
-//register controller
-
-//follow controller
+Router.get(
+  apiPaths.getFeedPosts,
+  PassportMiddleware,
+  GetPostsController.feedPosts
+)
 
 export default Router
