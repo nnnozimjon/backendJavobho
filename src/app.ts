@@ -21,6 +21,7 @@ const connectionData = {
   user: 'iamnozns_javobho',
   password: '@163425102100ismyPass',
   database: 'iamnozns_javobho',
+  timezone: 'utc',
 }
 const con = mysql.createPool(connectionData)
 

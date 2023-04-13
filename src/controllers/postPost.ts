@@ -7,19 +7,17 @@ class PostController {
   static async Post(req: Request, res: Response) {
     try {
       const { text, image, type, userId } = req.body
-      const extension = image?.split(';')[0].split('/')[1]
-      const filename = uuidv4()
       let newImage = ''
 
       if (image) {
-        const imageData = image.split(',')[1]
+        const extension = image.split(';')[0].split('/')[1]
         const data = image.replace(/^data:image\/\w+;base64,/, '')
-        await fs.writeFile(
-          `src/assets/img/posts/${filename}.${extension}`,
-          data,
-          { encoding: 'base64' }
-        )
-        newImage = `${filename}.${extension}`
+        const filename = `${uuidv4()}.${extension}`
+
+        await fs.writeFile(`src/assets/img/posts/${filename}`, data, {
+          encoding: 'base64',
+        })
+        newImage = filename
       }
 
       const sqlPost =

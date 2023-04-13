@@ -87,13 +87,9 @@ class GetPostsController {
       username,
       verified,
       fullname
-  from jvb_users WHERE userId in (?);`
+      from jvb_users WHERE userId in (?);`
 
-      const commentLikeSql = `
-      SELECT commentId, COUNT(*) AS likeCount, GROUP_CONCAT(userId) AS userIds
-      FROM jvb_commentLike
-      WHERE commentId IN (?)
-      GROUP BY commentId;`
+      const commentLikeSql = `SELECT commentId, COUNT(*) AS likeCount, GROUP_CONCAT(userId) AS userIds FROM jvb_commentLike WHERE commentId IN (?) GROUP BY commentId;`
 
       const posts: Post[] = await new Promise((resolve, reject) => {
         con.query(postSql, userId, (err, result) => {
@@ -107,9 +103,10 @@ class GetPostsController {
         return post.postId
       })
 
+      const commentQuery = postIds.length > 0 ? postIds : 0
       // get all comments with post ids
       const comments: Comment[] = await new Promise((resolve, reject) => {
-        con.query(commentSql, [postIds], (err, result) => {
+        con.query(commentSql, [commentQuery], (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
@@ -119,15 +116,17 @@ class GetPostsController {
         return comment.commentId
       })
 
+      const commentLikeQuery = commentIds.length > 0 ? commentIds : 0
       const commentLikes: any[] = await new Promise((resolve, reject) => {
-        con.query(commentLikeSql, [commentIds], (err, result) => {
+        con.query(commentLikeSql, [commentLikeQuery], (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
       })
 
+      const likesQuery = postIds.length > 0 ? postIds : 0
       const likes: any[] = await new Promise((resolve, reject) => {
-        con.query(likesSql, [postIds], (err, result) => {
+        con.query(likesSql, [likesQuery], (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
@@ -137,8 +136,10 @@ class GetPostsController {
         return like.userId
       })
 
+      const likedQuery = likedIds.length > 0 ? likedIds : 0
+
       const AlllikedUsers: any[] = await new Promise((resolve, reject) => {
-        con.query(likedUsers, [likedIds], (err, result) => {
+        con.query(likedUsers, [likedQuery], (err, result) => {
           if (err) reject(err)
           resolve(result)
         })
