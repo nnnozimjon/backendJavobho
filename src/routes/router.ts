@@ -57,4 +57,13 @@ Router.get(
   GetPostsController.feedPosts
 )
 
+Router.post(
+  apiPaths.commentPost,
+  PassportMiddleware,
+  PostController.commentPost
+)
+Router.post(apiPaths.likePost, PassportMiddleware, PostController.likePost)
+Router.post(apiPaths.unlikePost, PassportMiddleware, PostController.unlikePost)
+Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+
 export default Router

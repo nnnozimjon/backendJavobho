@@ -40,6 +40,10 @@ class PostController {
       res.json({ message: 'failed' })
     }
   }
+  static async commentPost(req: Request, res: Response) {}
+  static async likePost(req: Request, res: Response) {}
+  static async unlikePost(req: Request, res: Response) {}
+  static async repostPost(req: Request, res: Response) {}
 }
 
 export default PostController

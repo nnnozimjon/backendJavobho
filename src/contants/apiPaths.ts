@@ -16,4 +16,10 @@ export const apiPaths = {
   postFollowUser: '/api/user/post/follow',
   postUnfollowUser: '/api/user/post/unfollow',
   getUserPosts: '/api/user/get/posts/:userId',
+
+  // should be made
+  commentPost: '/api/user/comment/post',
+  likePost: '/api/user/like/post',
+  unlikePost: '/api/user/unlike/post',
+  repostPost: '/api/user/repost/post',
 }
