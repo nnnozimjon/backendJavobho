@@ -78,7 +78,6 @@ class GetPostsController {
       const likesSql = `
       SELECT likeID,
       userId,
-      type,
       objectId
       from jvb_likes WHERE objectId IN  (?);`
 
@@ -270,7 +269,6 @@ class GetPostsController {
       const likesSql = `
       SELECT likeID,
       userId,
-      type,
       objectId
       from jvb_likes WHERE objectId IN  (?);`
 
