@@ -90,6 +90,9 @@ class GetPostsController {
 
       const commentLikeSql = `SELECT commentId, COUNT(*) AS likeCount, GROUP_CONCAT(userId) AS userIds FROM jvb_commentLike WHERE commentId IN (?) GROUP BY commentId;`
 
+      const repostSql =
+        'SELECT postId, COUNT(*) AS repostCount FROM jvb_repost WHERE jvb_repost.postId IN (?) GROUP BY postId;'
+
       const posts: Post[] = await new Promise((resolve, reject) => {
         con.query(postSql, userId, (err, result) => {
           if (err) reject(err)
@@ -100,6 +103,15 @@ class GetPostsController {
       // get all posts ids from posts
       const postIds = await posts.map(post => {
         return post.postId
+      })
+
+      const repostQuery = postIds.length > 0 ? postIds : 0
+
+      const repost: any[] = await new Promise((resolve, reject) => {
+        con.query(repostSql, [repostQuery], (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
       })
 
       const commentQuery = postIds.length > 0 ? postIds : 0
@@ -196,6 +208,9 @@ class GetPostsController {
               post.avatar &&
               baseUrl + '/api/user/profile/img/avatar/' + post.avatar,
             likedByUser: postLikedByUser,
+            repostCount: repost.filter(
+              repost => repost.postId === post.postId
+            )[0]?.repostCount,
             comments: postComments.map(comment => ({
               commentId: comment.commentId,
               userId: comment.userId,

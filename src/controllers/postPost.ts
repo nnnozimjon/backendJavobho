@@ -104,7 +104,31 @@ class PostController {
     }
   }
 
-  static async unlikePost(req: Request, res: Response) {}
+  static async unlikePost(req: Request, res: Response) {
+    try {
+      const token = req.headers?.authorization
+      const { userId, postId } = req.body
+      const commentSql =
+        'DELETE FROM jvb_likes WHERE userId = ? AND objectId = ?;'
+
+      if (await isUserRequester(token, userId)) {
+        const result: any = await new Promise((resolve, reject) => {
+          con.query(commentSql, [userId, postId], (err, result) => {
+            if (err) {
+              reject(err)
+            }
+            resolve(result)
+          })
+        })
+
+        res.json({ message: result.affectedRows > 0 ? 'success' : 'failed' })
+      } else {
+        res.sendStatus(400)
+      }
+    } catch (error) {
+      res.json({ message: 'failed' })
+    }
+  }
   static async repostPost(req: Request, res: Response) {}
 }
 
