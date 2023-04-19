@@ -27,6 +27,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/moment-timezone": "^0.5.30",
     "@types/mysql": "^2.15.21",
+    "@types/socket.io": "^3.0.2",
     "@types/uuid": "^9.0.1",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
@@ -34,9 +35,11 @@
     "crypto": "^1.0.1",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
     "moment-timezone": "^0.5.43",
     "mysql": "^2.18.1",
+    "socket.io": "^4.6.1",
     "uuid": "^9.0.0"
   }
 }
