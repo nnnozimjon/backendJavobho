@@ -10,6 +10,7 @@ import GetFollowController from '../controllers/getFollow'
 import GetPostsController from '../controllers/getPosts'
 import PostController from '../controllers/postPost'
 import { apiPaths } from '../contants/apiPaths'
+import UserController from '../controllers/user'
 
 const Router = express.Router()
 
@@ -49,8 +50,6 @@ Router.get(
   GetPostsController.getUserPosts
 )
 
-Router.get('/check/:userId', GetPostsController.getUserPosts)
-
 Router.get(
   apiPaths.getFeedPosts,
   PassportMiddleware,
@@ -65,5 +64,7 @@ Router.post(
 Router.post(apiPaths.likePost, PassportMiddleware, PostController.likePost)
 Router.post(apiPaths.unlikePost, PassportMiddleware, PostController.unlikePost)
 Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+
+Router.get(apiPaths.userProfile, PassportMiddleware, UserController.profile)
 
 export default Router

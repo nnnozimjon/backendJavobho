@@ -22,4 +22,5 @@ export const apiPaths = {
   likePost: '/api/user/like/post',
   unlikePost: '/api/user/unlike/post',
   repostPost: '/api/user/repost/post',
+  userProfile: '/api/user/get/profile/:username',
 }

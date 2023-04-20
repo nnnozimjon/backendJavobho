@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { con } from '../app'
 import { baseUrl } from '../utils/baseURL'
+import secret from '../validators'
+import jwt from 'jsonwebtoken'
 
 interface Post {
   postId: number
@@ -41,6 +43,12 @@ interface User {
 }
 class GetPostsController {
   static async getUserPosts(req: Request, res: Response) {
+    const access_token = req.headers?.authorization
+    const token = access_token?.slice(7).replace(/"/g, '') || ''
+    const decoded: any = jwt.verify(token, secret)
+
+    const RequesterId = decoded?.userId
+
     const userId = req.params.userId
 
     try {
@@ -163,7 +171,9 @@ class GetPostsController {
             comment => comment.postId == post.postId
           )
           const postLikes = likes.filter(like => like.objectId == post.postId)
-          const postLikedByUser = postLikes.some(like => like.userId == userId)
+          const postLikedByUser = postLikes.some(
+            like => like.userId == RequesterId
+          )
 
           const commentsLikes = postComments.map(comment => {
             const filteredLikes = commentLikes.filter(
@@ -172,7 +182,7 @@ class GetPostsController {
             const commentLikeCount = filteredLikes[0]?.likeCount
 
             const commentLikedbyUser = filteredLikes.some(
-              like => like.userIds == userId
+              like => like.userIds == RequesterId
             )
             return {
               commentId: comment.commentId,
