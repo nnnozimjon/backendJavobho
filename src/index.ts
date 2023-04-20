@@ -1,5 +1,5 @@
-// import App from './app'
+import App from './app'
 
-// App.listen(8000, () => {
-//   console.log(`Listening on ${8000}`)
-// })
+App.listen(8000, () => {
+  console.log(`Listening on ${8000}`)
+})
