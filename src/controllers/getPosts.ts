@@ -19,6 +19,11 @@ interface Post {
   likedByUser: boolean
   comments: Comment[]
   likedByUsers: User[]
+  reposterId: number
+  reposterText: string
+  reposterUsername: string
+  reposterFullname: string
+  reposterVerified: boolean
 }
 
 interface Comment {
@@ -63,10 +68,16 @@ class GetPostsController {
       ju.verified,
       ju.username,
       ju.fullname,
-      ju.avatar
+      ju.avatar,
+      jp.reposterText,
+      ja.userId AS reposterUserId,
+      ja.username AS reposterUsername,
+      ja.fullname AS reposterFullname,
+      ja.verified AS reposterVerified
       FROM jvb_posts jp
       LEFT JOIN jvb_users ju ON jp.userId = ju.userId
-      WHERE jp.userId = ? AND jp.status = 'publish'
+      LEFT JOIN jvb_users ja ON jp.reposterId = ja.userId
+      WHERE jp.userId = ? AND jp.status = 'publish' AND jp.type = 'post' || jp.type = 'repost'
       ORDER BY jp.createdAt DESC;`
 
       const commentSql = `SELECT jc.commentId,
@@ -98,8 +109,7 @@ class GetPostsController {
 
       const commentLikeSql = `SELECT commentId, COUNT(*) AS likeCount, GROUP_CONCAT(userId) AS userIds FROM jvb_commentLike WHERE commentId IN (?) GROUP BY commentId;`
 
-      const repostSql =
-        'SELECT postId, COUNT(*) AS repostCount FROM jvb_repost WHERE jvb_repost.postId IN (?) GROUP BY postId;'
+      const repostSql = `SELECT postId, COUNT(*) AS repostCount FROM jvb_posts WHERE jvb_posts.type = 'repost' AND jvb_posts.postId IN (?) GROUP BY postId;`
 
       const posts: Post[] = await new Promise((resolve, reject) => {
         con.query(postSql, userId, (err, result) => {
@@ -164,93 +174,100 @@ class GetPostsController {
         })
       })
 
-      const formattedData = {
-        message: 'success',
-        payload: posts.map(post => {
-          const postComments = comments.filter(
-            comment => comment.postId == post.postId
+      const formatedPosts = posts.map(post => {
+        const postComments = comments.filter(
+          comment => comment.postId == post.postId
+        )
+        const postLikes = likes.filter(like => like.objectId == post.postId)
+        const postLikedByUser = postLikes.some(
+          like => like.userId == RequesterId
+        )
+
+        const commentsLikes = postComments.map(comment => {
+          const filteredLikes = commentLikes.filter(
+            like => like.commentId == comment.commentId
           )
-          const postLikes = likes.filter(like => like.objectId == post.postId)
-          const postLikedByUser = postLikes.some(
-            like => like.userId == RequesterId
+          const commentLikeCount = filteredLikes[0]?.likeCount
+
+          const commentLikedbyUser = filteredLikes.some(
+            like => like.userIds == RequesterId
           )
-
-          const commentsLikes = postComments.map(comment => {
-            const filteredLikes = commentLikes.filter(
-              like => like.commentId == comment.commentId
-            )
-            const commentLikeCount = filteredLikes[0]?.likeCount
-
-            const commentLikedbyUser = filteredLikes.some(
-              like => like.userIds == RequesterId
-            )
-            return {
-              commentId: comment.commentId,
-              commentLikeCount,
-              commentLikedbyUser,
-            }
-          })
-
-          const postLikedByUsers = postLikes.map(like => {
-            const user = AlllikedUsers.find(user => user.userId == like.userId)
-            return {
-              userId: user.userId,
-              username: user.username,
-              verified: user.verified,
-              fullname: user.fullname,
-            }
-          })
-
           return {
-            postId: post.postId,
-            text: post.text,
-            image:
-              post.image &&
-              baseUrl + '/api/user/profile/posts/post/' + post.image,
-            type: post.type,
-            status: post.status,
-            createdAt: post.createdAt,
-            userId: post.userId,
-            username: post.username,
-            fullname: post.fullname,
-            verified: post.verified,
-            avatar:
-              post.avatar &&
-              baseUrl + '/api/user/profile/img/avatar/' + post.avatar,
-            likedByUser: postLikedByUser,
-            repostCount: repost.filter(
-              repost => repost.postId === post.postId
-            )[0]?.repostCount,
-            comments: postComments.map(comment => ({
-              commentId: comment.commentId,
-              userId: comment.userId,
-              text: comment.commentText,
-              createdAt: comment.createdAt,
-              commenterUsername: comment.commenterUsername,
-              commenterVerified: comment.commenterVerified,
-              commenterFullname: comment.commenterFullname,
-              commenterAvatar:
-                comment.commenterAvatar &&
-                baseUrl +
-                  '/api/user/profile/img/avatar/' +
-                  comment.commenterAvatar,
-              commentLikeCount: commentsLikes.find(
-                like => like.commentId === comment.commentId
-              )?.commentLikeCount,
-              commentLikeByUser: commentsLikes.find(
-                like => like.commentId === comment.commentId
-              )?.commentLikedbyUser,
-            })),
-            likedByUsers: postLikedByUsers,
+            commentId: comment.commentId,
+            commentLikeCount,
+            commentLikedbyUser,
           }
-        }),
-      }
-      res.json(formattedData)
+        })
+
+        const postLikedByUsers = postLikes.map(like => {
+          const user = AlllikedUsers.find(user => user.userId == like.userId)
+          return {
+            userId: user.userId,
+            username: user.username,
+            verified: user.verified,
+            fullname: user.fullname,
+          }
+        })
+        const postImage =
+          post.image && baseUrl + '/api/user/profile/posts/post/' + post.image
+        const avatarImage =
+          post.avatar && baseUrl + '/api/user/profile/img/avatar/' + post.avatar
+        const repostCountFilter = repost.filter(
+          repost => repost.postId === post.postId
+        )[0]?.repostCount
+
+        const postCommentsMap = postComments.map(comment => ({
+          commentId: comment.commentId,
+          userId: comment.userId,
+          text: comment.commentText,
+          createdAt: comment.createdAt,
+          commenterUsername: comment.commenterUsername,
+          commenterVerified: comment.commenterVerified,
+          commenterFullname: comment.commenterFullname,
+          commenterAvatar:
+            comment.commenterAvatar &&
+            baseUrl + '/api/user/profile/img/avatar/' + comment.commenterAvatar,
+          commentLikeCount: commentsLikes.find(
+            like => like.commentId === comment.commentId
+          )?.commentLikeCount,
+          commentLikeByUser: commentsLikes.find(
+            like => like.commentId === comment.commentId
+          )?.commentLikedbyUser,
+        }))
+
+        return {
+          postId: post.postId,
+          text: post.text,
+          image: postImage,
+          type: post.type,
+          status: post.status,
+          createdAt: post.createdAt,
+          userId: post.userId,
+          username: post.username,
+          fullname: post.fullname,
+          verified: post.verified,
+          avatar: avatarImage,
+          likedByUser: postLikedByUser,
+          repostCount: repostCountFilter,
+          comments: postCommentsMap,
+          likedByUsers: postLikedByUsers,
+          reposterId: post.reposterId,
+          reposterText: post.reposterText,
+          reposterUsername: post.reposterUsername,
+          reposterFullname: post.reposterFullname,
+          reposterVerified: post.reposterVerified,
+        }
+      })
+
+      res.json({
+        message: 'success',
+        payload: formatedPosts,
+      })
     } catch (error) {
       res.json({ message: 'failed', error: error })
     }
   }
-
+  // ############################################################################################################
   static async feedPosts(req: Request, res: Response) {
     const userId = req.params.userId
 
