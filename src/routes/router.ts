@@ -24,6 +24,7 @@ Router.get(apiPaths.getProfileAvatarImage, GetImageController.profile)
 Router.get(apiPaths.getProfileHeaderImage, GetImageController.header)
 Router.get(apiPaths.getPostsImage, GetImageController.posts)
 Router.post(apiPaths.postUploadPost, PostRequestLimiter, PostController.Post)
+
 Router.get(
   apiPaths.getExploreTags,
   PassportMiddleware,
@@ -61,10 +62,21 @@ Router.post(
   PassportMiddleware,
   PostController.commentPost
 )
+Router.post(
+  apiPaths.updateProfile,
+  PassportMiddleware,
+  UserController.updateProfile
+)
+
 Router.post(apiPaths.likePost, PassportMiddleware, PostController.likePost)
 Router.post(apiPaths.unlikePost, PassportMiddleware, PostController.unlikePost)
 Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
 
 Router.get(apiPaths.userProfile, PassportMiddleware, UserController.profile)
+Router.get(
+  apiPaths.checkUsername,
+  PassportMiddleware,
+  UserController.checkUsername
+)
 
 export default Router
