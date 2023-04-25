@@ -102,31 +102,23 @@ class UserController {
     }
   }
 
-  static async checkUsername(req: Request, res: Response) {
+  static async checkUsernameExists(req: Request, res: Response) {
+    const { username, userId } = req.body
     try {
-      const token = req.headers.authorization || ''
-      const decode: any = jwt.verify(token, secret)
-      const { username, userId } = decode
-      res.json({ username: username })
-      console.log(userId)
-      // const sql = `SELECT * FROM jvb_users WHERE username = ?`
-      // const result: any = await new Promise((resolve, reject) => {
-      //   con.query(sql, username, (err, result) => {
-      //     if (err) {
-      //       reject(err)
-      //     }
-      //     resolve(result[0])
-      //   })
-      // })
-      // if (result.length > 0) {
-      //   if (result.userId == userId) {
-      //     res.json({ message: true })
-      //   } else {
-      //     res.json({ message: false })
-      //   }
-      // } else {
-      //   res.json({ message: true })
-      // }
+      const sql = `SELECT * FROM jvb_users WHERE username = ? AND userId != ?`
+      const result: any = await new Promise((resolve, reject) => {
+        con.query(sql, [username, userId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+      if (result.length > 0) {
+        res.json({ message: false })
+      } else {
+        res.json({ message: true })
+      }
     } catch (error) {
       res.json({ message: 'failed' })
     }
