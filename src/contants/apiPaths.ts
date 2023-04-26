@@ -24,4 +24,5 @@ export const apiPaths = {
   checkUsername: '/api/user/check/username/availability',
   repostPost: '/api/user/re/post/post',
   bookmarkPost: '/api/user/post/bookmark/post',
+  bookmarkDelete: '/api/user/post/bookmark/delete',
 }

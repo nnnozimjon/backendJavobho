@@ -197,6 +197,23 @@ class PostController {
       res.sendStatus(500)
     }
   }
+
+  static async bookmarkDelete(req: Request, res: Response) {
+    try {
+      const { postId, userId } = req.body
+
+      const deleteQuery =
+        'DELETE FROM jvb_bookmarks WHERE postId = ? AND userId = ?'
+      const deleteBookmark: any = new Promise((resolve, reject) => {
+        con.query(deleteQuery, [postId, userId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+    } catch (error) {}
+  }
 }
 
 export default PostController

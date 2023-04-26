@@ -87,4 +87,10 @@ Router.post(
   PostController.bookmarkPost
 )
 
+Router.post(
+  apiPaths.bookmarkDelete,
+  PassportMiddleware,
+  PostController.bookmarkDelete
+)
+
 export default Router
