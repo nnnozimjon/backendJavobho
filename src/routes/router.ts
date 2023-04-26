@@ -73,10 +73,18 @@ Router.post(apiPaths.unlikePost, PassportMiddleware, PostController.unlikePost)
 Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
 
 Router.get(apiPaths.userProfile, PassportMiddleware, UserController.profile)
+
 Router.post(
   apiPaths.checkUsername,
   PassportMiddleware,
   UserController.checkUsernameExists
+)
+
+Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+Router.post(
+  apiPaths.bookmarkPost,
+  PassportMiddleware,
+  PostController.bookmarkPost
 )
 
 export default Router
