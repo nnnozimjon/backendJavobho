@@ -57,7 +57,7 @@ class GetFollowController {
         },
       })
     } catch (error) {
-      res.sendStatus(501)
+      res.sendStatus(500)
     }
   }
   static async getFollowing(req: Request, res: Response) {}
@@ -117,7 +117,7 @@ class GetFollowController {
         res.sendStatus(400)
       }
     } catch (error) {
-      return res.sendStatus(501)
+      return res.sendStatus(500)
     }
   }
 }
