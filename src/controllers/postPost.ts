@@ -129,7 +129,91 @@ class PostController {
       res.json({ message: 'failed' })
     }
   }
-  static async repostPost(req: Request, res: Response) {}
+  static async repostPost(req: Request, res: Response) {
+    const token = req.headers.authorization || ''
+    const { userId, postId } = req.body
+
+    try {
+      const getPostById =
+        'SELECT text, image, userId from jvb_posts WHERE postId = ?'
+      if (await isUserRequester(token, userId)) {
+        const result: any = await new Promise((resolve, reject) => {
+          con.query(getPostById, postId, (err, result) => {
+            if (err) {
+              reject(err)
+            }
+            resolve(result[0])
+          })
+        })
+        const { text } = result
+        const reposterId = result.userId
+
+        if (text) {
+          const repostQuery =
+            'INSERT INTO jvb_posts(reposterText,type,userId, reposterId) VALUE (?,?,?,?)'
+          const postRepost: any = await new Promise((resolve, reject) => {
+            con.query(
+              repostQuery,
+              [text, 'repost', userId, reposterId],
+              (err, result) => {
+                if (err) {
+                  reject(err)
+                }
+                resolve(result)
+              }
+            )
+          })
+
+          res.json({
+            message: postRepost.affectedRows > 0 ? 'success' : 'failed',
+          })
+        } else {
+          res.sendStatus(500)
+        }
+      } else {
+        res.sendStatus(400)
+      }
+    } catch (error) {
+      res.sendStatus(500)
+    }
+  }
+
+  static async bookmarkPost(req: Request, res: Response) {
+    const { userId, postId } = req.body
+    try {
+      const bookmarkQuery =
+        'INSERT INTO jvb_bookmarks (userId, postId) VALUES(?,?)'
+      const result: any = await new Promise((resolve, reject) => {
+        con.query(bookmarkQuery, [userId, postId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+
+      res.json({ message: result.affectedRows > 0 ? 'success' : 'failed' })
+    } catch (error) {
+      res.sendStatus(500)
+    }
+  }
+
+  static async bookmarkDelete(req: Request, res: Response) {
+    try {
+      const { postId, userId } = req.body
+
+      const deleteQuery =
+        'DELETE FROM jvb_bookmarks WHERE postId = ? AND userId = ?'
+      const deleteBookmark: any = new Promise((resolve, reject) => {
+        con.query(deleteQuery, [postId, userId], (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+    } catch (error) {}
+  }
 }
 
 export default PostController

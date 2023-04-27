@@ -80,4 +80,17 @@ Router.post(
   UserController.checkUsernameExists
 )
 
+Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+Router.post(
+  apiPaths.bookmarkPost,
+  PassportMiddleware,
+  PostController.bookmarkPost
+)
+
+Router.post(
+  apiPaths.bookmarkDelete,
+  PassportMiddleware,
+  PostController.bookmarkDelete
+)
+
 export default Router

@@ -22,7 +22,7 @@ export const apiPaths = {
   userProfile: '/api/user/get/profile/:username',
   updateProfile: '/api/user/update/profile',
   checkUsername: '/api/user/check/username/availability',
-
-  // should be made
-  repostPost: '/api/user/repost/post',
+  repostPost: '/api/user/re/post/post',
+  bookmarkPost: '/api/user/post/bookmark/post',
+  bookmarkDelete: '/api/user/post/bookmark/delete',
 }
