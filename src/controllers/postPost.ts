@@ -204,7 +204,7 @@ class PostController {
 
       const deleteQuery =
         'DELETE FROM jvb_bookmarks WHERE postId = ? AND userId = ?'
-      const deleteBookmark: any = new Promise((resolve, reject) => {
+      const deleteBookmark: any = await new Promise((resolve, reject) => {
         con.query(deleteQuery, [postId, userId], (err, result) => {
           if (err) {
             reject(err)
@@ -212,7 +212,13 @@ class PostController {
           resolve(result)
         })
       })
-    } catch (error) {}
+
+      res.json({
+        message: deleteBookmark.affectedRows > 0 ? 'success' : 'failed',
+      })
+    } catch (error) {
+      res.sendStatus(500)
+    }
   }
 }
 

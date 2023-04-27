@@ -77,7 +77,7 @@ class GetPostsController {
       FROM jvb_posts jp
       LEFT JOIN jvb_users ju ON jp.userId = ju.userId
       LEFT JOIN jvb_users ja ON jp.reposterId = ja.userId
-      WHERE jp.userId = ? AND jp.status = 'publish' AND jp.type = 'post' || jp.type = 'repost'
+      WHERE jp.userId = ? AND (jp.status = 'publish') AND (jp.type = 'post' OR jp.type = 'repost')
       ORDER BY jp.createdAt DESC;`
 
       const commentSql = `SELECT jc.commentId,
@@ -110,6 +110,19 @@ class GetPostsController {
       const commentLikeSql = `SELECT commentId, COUNT(*) AS likeCount, GROUP_CONCAT(userId) AS userIds FROM jvb_commentLike WHERE commentId IN (?) GROUP BY commentId;`
 
       const repostSql = `SELECT postId, COUNT(*) AS repostCount FROM jvb_posts WHERE jvb_posts.type = 'repost' AND jvb_posts.postId IN (?) GROUP BY postId;`
+
+      const bookmarkQuery = `SELECT bookId, postId from jvb_bookmarks WHERE userId = ?;`
+
+      const bookMarksArray: any[] = await new Promise((resolve, reject) => {
+        con.query(bookmarkQuery, RequesterId, (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
+      })
+
+      const bookedPosts = bookMarksArray.map(post => {
+        return post.postId
+      })
 
       const posts: Post[] = await new Promise((resolve, reject) => {
         con.query(postSql, userId, (err, result) => {
@@ -182,6 +195,8 @@ class GetPostsController {
         const postLikedByUser = postLikes.some(
           like => like.userId == RequesterId
         )
+
+        const BookMarked = bookedPosts.some(book => post.postId == book)
 
         const commentsLikes = postComments.map(comment => {
           const filteredLikes = commentLikes.filter(
@@ -256,6 +271,7 @@ class GetPostsController {
           reposterUsername: post.reposterUsername,
           reposterFullname: post.reposterFullname,
           reposterVerified: post.reposterVerified,
+          booked: BookMarked,
         }
       })
 
