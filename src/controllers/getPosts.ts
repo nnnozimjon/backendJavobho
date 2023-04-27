@@ -113,6 +113,18 @@ class GetPostsController {
 
       const bookmarkQuery = `SELECT bookId, postId from jvb_bookmarks WHERE userId = ?;`
 
+      const followersQuery = `SELECT followId, followerId from jvb_follow WHERE followingId = ?`
+
+      const followersArray: any[] = await new Promise((resolve, reject) => {
+        con.query(followersQuery, RequesterId, (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        })
+      })
+      const followersList = followersArray.map(follow => {
+        return follow.followerId
+      })
+
       const bookMarksArray: any[] = await new Promise((resolve, reject) => {
         con.query(bookmarkQuery, RequesterId, (err, result) => {
           if (err) reject(err)
@@ -197,6 +209,7 @@ class GetPostsController {
         )
 
         const BookMarked = bookedPosts.some(book => post.postId == book)
+        const isFollowing = followersList.some(follow => post.userId == follow)
 
         const commentsLikes = postComments.map(comment => {
           const filteredLikes = commentLikes.filter(
@@ -272,6 +285,7 @@ class GetPostsController {
           reposterFullname: post.reposterFullname,
           reposterVerified: post.reposterVerified,
           booked: BookMarked,
+          isFollowing: isFollowing,
         }
       })
 

@@ -3,6 +3,7 @@ import { con } from '../app'
 import { baseUrl } from '../utils/baseURL'
 import jwt from 'jsonwebtoken'
 import secret from '../validators'
+import isUserRequester from './check/isUserRequester'
 
 interface followers {
   userId: number
@@ -63,59 +64,57 @@ class GetFollowController {
 
   static postFollow = async (req: Request, res: Response) => {
     try {
-      const token = await req.headers.authorization?.slice(7).replace(/"/g, '')
-      const decoded: any = jwt.verify(token as string & { exp: number }, secret)
-      const { userId }: any = decoded
+      const token = req.headers.authorization
+
       const { followerId, followingId } = req.body
 
-      if (userId !== followerId) {
-        return res.sendStatus(401)
-      }
+      if (await isUserRequester(token, followerId)) {
+        if (followerId !== followerId) {
+          return res.sendStatus(401)
+        }
 
-      if (userId === followingId) {
-        return res.sendStatus(403)
-      }
+        if (followerId === followingId) {
+          return res.sendStatus(400)
+        }
 
-      const sql = `INSERT INTO jvb_follow (followerId,followingId) VALUES(?,?)`
+        const sql = `INSERT INTO jvb_follow (followerId,followingId) VALUES(?,?)`
 
-      const result: any = await new Promise((resolve, reject) => {
-        con.query(sql, [followerId, followingId], (err, result) => {
-          if (err) {
-            reject(err)
-          }
-          resolve(result)
+        const result: any = await new Promise((resolve, reject) => {
+          con.query(sql, [followerId, followingId], (err, result) => {
+            if (err) {
+              reject(err)
+            }
+            resolve(result)
+          })
         })
-      })
 
-      if (result.affectedRows > 0) {
-        res.sendStatus(200)
-      } else {
-        res.sendStatus(501)
+        res.json({ message: result.affectedRows > 0 ? 'success' : 'failed' })
       }
     } catch (error) {
-      console.error(error)
-      res.sendStatus(501)
+      res.sendStatus(500)
     }
   }
 
   static async postUnfollow(req: Request, res: Response) {
+    const token = req.headers.authorization
     const { followerId, followingId } = req.body
 
     try {
       const sql = `DELETE FROM jvb_follow WHERE followerId = ? AND followingId = ?`
 
-      const result: any = await new Promise((resolve, reject) => {
-        con.query(sql, [followerId, followingId], (err, result) => {
-          if (err) {
-            reject(err)
-          }
-          resolve(result)
+      if (await isUserRequester(token, followerId)) {
+        const result: any = await new Promise((resolve, reject) => {
+          con.query(sql, [followerId, followingId], (err, result) => {
+            if (err) {
+              reject(err)
+            }
+            resolve(result)
+          })
         })
-      })
-      if (result.affectedRows > 0) {
-        res.json(200)
+
+        res.json({ message: result.affectedRows > 0 ? 'success' : 'failed' })
       } else {
-        res.sendStatus(501)
+        res.sendStatus(400)
       }
     } catch (error) {
       return res.sendStatus(501)
