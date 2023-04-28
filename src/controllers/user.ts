@@ -7,11 +7,34 @@ import secret from '../validators'
 
 class UserController {
   static async profile(req: Request, res: Response) {
+    const access_token = req.headers?.authorization
+    const token = access_token?.slice(7).replace(/"/g, '') || ''
+    const decoded: any = jwt.verify(token, secret)
+
+    const RequesterId = decoded?.userId
+
     try {
       const { username } = req.params
 
       const userSql =
         'SELECT userId, username, fullname, description, verified, avatar, splashImage, createdAt FROM jvb_users WHERE username = ?'
+
+      // get all following users of RequesterId
+      const followingQuery =
+        'SELECT followId, followingId from jvb_follow WHERE followerId = ?'
+
+      const followList: any[] = await new Promise((resolve, reject) => {
+        con.query(followingQuery, RequesterId, (err, result) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(result)
+        })
+      })
+
+      const followersList = followList.map(follow => {
+        return follow.followingId
+      })
 
       const User: any = await new Promise((resolve, reject) => {
         con.query(userSql, username, (err, result) => {
@@ -21,6 +44,8 @@ class UserController {
           resolve(result.find((user: any) => user.username === username))
         })
       })
+
+      const isFollowing = followersList.includes(User.userId)
 
       res.json({
         payload: {
@@ -32,10 +57,11 @@ class UserController {
           avatar: `${baseUrl}/api/user/profile/img/avatar/${User?.avatar}`,
           splashImage: `${baseUrl}/api/user/profile/img/header/${User?.splashImage}`,
           createdAt: User?.createdAt,
+          isFollowing: isFollowing,
         },
       })
     } catch (error) {
-      res.sendStatus(400)
+      res.sendStatus(500)
     }
   }
 
