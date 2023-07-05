@@ -20,10 +20,10 @@ App.use(cors())
 App.use(Router)
 
 const connectionData = {
-  host: 'iamnozns.beget.tech',
-  user: 'iamnozns_javobho',
-  password: '@163425102100ismyPass',
-  database: 'iamnozns_javobho',
+  host: '45.8.133.52',
+  user: 'admin',
+  password: '163425102100ismypaSS',
+  database: 'test',
   timezone: 'utc',
 }
 const con = mysql.createPool(connectionData)
