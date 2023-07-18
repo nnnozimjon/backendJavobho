@@ -4,14 +4,14 @@ import cors from 'cors'
 import mysql from 'mysql'
 import Router from './routes/router'
 import path from 'path'
-// import http from 'http'
-// import { Server } from 'socket.io'
+import http from 'http'
+import { Server } from 'socket.io'
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
 const App = express()
-// const server = http.createServer(App)
-// const io = new Server(server)
+const server = http.createServer(App)
+const io = new Server(server)
 
 App.use(express.json({ limit: '10mb' }))
 App.use(express.urlencoded({ extended: true }))
@@ -26,6 +26,7 @@ const connectionData = {
   database: 'test',
   timezone: 'utc',
 }
+
 const con = mysql.createPool(connectionData)
 
 con.getConnection(err => {
@@ -36,18 +37,13 @@ con.getConnection(err => {
   }
 })
 
-// io.on('connection', socket => {
-//   console.log('A user connected!')
+io.on('connection', socket => {
+  console.log('a user connected')
 
-//   socket.on('disconnect', () => {
-//     console.log('A user disconnected!')
-//   })
-// })
-
-// const port = 8000
-// server.listen(port, () => {
-//   console.log(`Server listening on port ${port}`)
-// })
+  socket.on('chatRoom', msg => {
+    console.log('This is chat room ' + msg)
+  })
+})
 
 export { con }
-export default App
+export default server

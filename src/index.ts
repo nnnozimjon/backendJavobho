@@ -1,5 +1,5 @@
-import App from './app'
+import server from './app'
 
-App.listen(8000, () => {
+server.listen(8000, () => {
   console.log(`Listening on ${8000}`)
 })

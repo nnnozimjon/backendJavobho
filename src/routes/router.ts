@@ -93,4 +93,6 @@ Router.post(
   PostController.bookmarkDelete
 )
 
+Router.get(apiPaths.getFeedPosts)
+
 export default Router
