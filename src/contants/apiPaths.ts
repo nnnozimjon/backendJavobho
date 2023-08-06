@@ -1,6 +1,6 @@
 export const apiPaths = {
   index: '/',
-  api: '/api',
+
 
   login: '/api/auth/login',
   register: '/api/auth/register',

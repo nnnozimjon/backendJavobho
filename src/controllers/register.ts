@@ -8,7 +8,7 @@ import {
 
 class RegisterController {
   static async register(req: Request, res: Response) {
-    const { username, fullname, description, email, password }: IAuth.register =
+    const { username, fullname, description, email, password }: IAuth.register =  
       req.body
 
     if (!username || !email || !password) {

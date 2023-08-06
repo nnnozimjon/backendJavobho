@@ -15,7 +15,6 @@ import UserController from '../controllers/user'
 const Router = express.Router()
 
 Router.get(apiPaths.index, RouteController.home)
-Router.get(apiPaths.api, RouteController.Welcome)
 
 Router.post(apiPaths.login, RequestLimiter, LoginController.login)
 Router.post(apiPaths.register, RequestLimiter, RegisterController.register)
