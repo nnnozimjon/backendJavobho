@@ -1,95 +1,110 @@
 import express from 'express'
-import RouteController from '../controllers'
-import LoginController from '../controllers/login'
-import RegisterController from '../controllers/register'
 import { RequestLimiter, PostRequestLimiter } from '../middleware/RateLimit'
 import PassportMiddleware from '../middleware'
-import GetImageController from '../controllers/getImage'
-import GetHashTagsController from '../controllers/getHashTags'
-import GetFollowController from '../controllers/getFollow'
-import GetPostsController from '../controllers/getPosts'
-import PostController from '../controllers/postPost'
 import { apiPaths } from '../contants/apiPaths'
-import UserController from '../controllers/user'
-
+import System from '../controllers'
 const Router = express.Router()
 
-Router.get(apiPaths.index, RouteController.home)
-
-Router.post(apiPaths.login, RequestLimiter, LoginController.login)
-Router.post(apiPaths.register, RequestLimiter, RegisterController.register)
-
-Router.get(apiPaths.getProfileAvatarImage, GetImageController.profile)
-Router.get(apiPaths.getProfileHeaderImage, GetImageController.header)
-Router.get(apiPaths.getPostsImage, GetImageController.posts)
-Router.post(apiPaths.postUploadPost, PostRequestLimiter, PostController.Post)
-
+Router.post(apiPaths.login, RequestLimiter, System.LoginController.login)
+Router.post(
+  apiPaths.register,
+  RequestLimiter,
+  System.RegisterController.register
+)
+Router.get(apiPaths.getProfileAvatarImage, System.GetImageController.profile)
+Router.get(apiPaths.getProfileHeaderImage, System.GetImageController.header)
+Router.get(apiPaths.getPostsImage, System.GetImageController.posts)
+Router.post(
+  apiPaths.postUploadPost,
+  PostRequestLimiter,
+  System.PostController.Post
+)
 Router.get(
   apiPaths.getExploreTags,
   PassportMiddleware,
-  GetHashTagsController.tags
+  System.GetHashTagsController.tags
 )
 Router.get(
   apiPaths.getUserFollowersAndFollowings,
   PassportMiddleware,
-  GetFollowController.getFollowersAndFollowing
+  System.GetFollowController.getFollowersAndFollowing
 )
 Router.post(
   apiPaths.postFollowUser,
   [PassportMiddleware, PostRequestLimiter],
-  GetFollowController.postFollow
+  System.GetFollowController.postFollow
 )
 Router.post(
   apiPaths.postUnfollowUser,
   [PassportMiddleware, PostRequestLimiter],
-  GetFollowController.postUnfollow
+  System.GetFollowController.postUnfollow
 )
 Router.get(
   apiPaths.getUserPosts,
   PassportMiddleware,
-  GetPostsController.getUserPosts
+  System.GetPostsController.getUserPosts
 )
 
 Router.get(
   apiPaths.getFeedPosts,
   PassportMiddleware,
-  GetPostsController.feedPosts
+  System.GetPostsController.feedPosts
 )
 
 Router.post(
   apiPaths.commentPost,
   PassportMiddleware,
-  PostController.commentPost
+  System.PostController.commentPost
 )
 Router.post(
   apiPaths.updateProfile,
   PassportMiddleware,
-  UserController.updateProfile
+  System.UserController.updateProfile
 )
 
-Router.post(apiPaths.likePost, PassportMiddleware, PostController.likePost)
-Router.post(apiPaths.unlikePost, PassportMiddleware, PostController.unlikePost)
-Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+Router.post(
+  apiPaths.likePost,
+  PassportMiddleware,
+  System.PostController.likePost
+)
+Router.post(
+  apiPaths.unlikePost,
+  PassportMiddleware,
+  System.PostController.unlikePost
+)
+Router.post(
+  apiPaths.repostPost,
+  PassportMiddleware,
+  System.PostController.repostPost
+)
 
-Router.get(apiPaths.userProfile, PassportMiddleware, UserController.profile)
+Router.get(
+  apiPaths.userProfile,
+  PassportMiddleware,
+  System.UserController.profile
+)
 
 Router.post(
   apiPaths.checkUsername,
   PassportMiddleware,
-  UserController.checkUsernameExists
+  System.UserController.checkUsernameExists
 )
 
-Router.post(apiPaths.repostPost, PassportMiddleware, PostController.repostPost)
+Router.post(
+  apiPaths.repostPost,
+  PassportMiddleware,
+  System.PostController.repostPost
+)
 Router.post(
   apiPaths.bookmarkPost,
   PassportMiddleware,
-  PostController.bookmarkPost
+  System.PostController.bookmarkPost
 )
 
 Router.post(
   apiPaths.bookmarkDelete,
   PassportMiddleware,
-  PostController.bookmarkDelete
+  System.PostController.bookmarkDelete
 )
 
 Router.get(apiPaths.getFeedPosts)

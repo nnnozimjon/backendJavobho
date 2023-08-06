@@ -1,5 +1,5 @@
 import { con } from '../../app'
-import IAuth from '../interfaces/auth.interface'
+import IAuth from '../../interfaces/auth.interface'
 import bcrypt from 'bcrypt'
 
 async function checkUsernameAvailability(username: string): Promise<boolean> {

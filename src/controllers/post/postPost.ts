@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import fs from 'fs/promises'
 import { v4 as uuidv4 } from 'uuid'
-import { con } from '../app'
-import isUserRequester from './check/isUserRequester'
+import { con } from '../../app'
+import isUserRequester from '../check/isUserRequester'
 
 class PostController {
   static async Post(req: Request, res: Response) {
@@ -47,7 +47,6 @@ class PostController {
     }
   }
 
-  // comment in post
   static async commentPost(req: Request, res: Response) {
     try {
       const token = req.headers?.authorization
@@ -78,7 +77,6 @@ class PostController {
     }
   }
 
-  //
   static async likePost(req: Request, res: Response) {
     try {
       const token = req.headers?.authorization
@@ -129,6 +127,7 @@ class PostController {
       res.json({ message: 'failed' })
     }
   }
+
   static async repostPost(req: Request, res: Response) {
     const token = req.headers.authorization || ''
     const { userId, postId } = req.body

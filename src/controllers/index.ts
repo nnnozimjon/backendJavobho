@@ -1,11 +1,21 @@
-import { Request, Response, NextFunction } from 'express'
+import LoginController from './auth/login'
+import RegisterController from './auth/register'
+import GetImageController from './post/getImage'
+import PostController from './post/postPost'
+import GetHashTagsController from './hashTags/getHashTags'
+import GetFollowController from './follow/getFollow'
+import GetPostsController from './post/getPosts'
+import UserController from './follow/user'
 
-class RouteController {
-  static home(req: Request, res: Response) {
-    res.send({
-      latesUpdate: '06-08-2023 12:06 PM'
-    })
-  }
+const System = {
+  LoginController,
+  RegisterController,
+  GetFollowController,
+  GetImageController,
+  PostController,
+  GetHashTagsController,
+  GetPostsController,
+  UserController,
 }
 
-export default RouteController
+export default System

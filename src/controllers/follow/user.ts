@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { con } from '../app'
-import { baseUrl } from '../utils/baseURL'
-import isUserRequester from './check/isUserRequester'
+import { con } from '../../app'
+import { baseUrl } from '../../utils/baseURL'
+import isUserRequester from '../check/isUserRequester'
 import jwt from 'jsonwebtoken'
-import secret from '../validators'
+import secret from '../../validators'
 
 class UserController {
   static async profile(req: Request, res: Response) {

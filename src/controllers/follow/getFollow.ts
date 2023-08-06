@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { con } from '../app'
-import { baseUrl } from '../utils/baseURL'
+import { con } from '../../app'
+import { baseUrl } from '../../utils/baseURL'
 import jwt from 'jsonwebtoken'
-import secret from '../validators'
-import isUserRequester from './check/isUserRequester'
+import secret from '../../validators'
+import isUserRequester from '../check/isUserRequester'
 
 interface followers {
   userId: number

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { con } from '../app'
+import { con } from '../../app'
 
 class GetHashTagsController {
   static async tags(req: Request, res: Response) {

@@ -1,51 +1,10 @@
 import { Request, Response } from 'express'
-import { con } from '../app'
-import { baseUrl } from '../utils/baseURL'
-import secret from '../validators'
+import { con } from '../../app'
+import { baseUrl } from '../../utils/baseURL'
+import secret from '../../validators'
 import jwt from 'jsonwebtoken'
+import { Comment, Post } from '../../interfaces/post.inteface'
 
-interface Post {
-  postId: number
-  text: string
-  image: string
-  type: string
-  status: string
-  createdAt: Date
-  userId: number
-  username: string
-  fullname: string
-  verified: boolean
-  avatar: string
-  likedByUser: boolean
-  comments: Comment[]
-  likedByUsers: User[]
-  reposterId: number
-  reposterText: string
-  reposterUsername: string
-  reposterFullname: string
-  reposterVerified: boolean
-}
-
-interface Comment {
-  postId: number
-  commentId: number
-  userId: number
-  commentText: string
-  createdAt: Date
-  commenterUsername: string
-  commenterVerified: boolean
-  commenterFullname: string
-  commenterAvatar: string
-  commentLikeCount: number
-  commentLikedByUser: boolean
-}
-
-interface User {
-  userId: number
-  username: string
-  verified: boolean
-  fullname: string
-}
 class GetPostsController {
   static async getUserPosts(req: Request, res: Response) {
     const access_token = req.headers?.authorization
@@ -298,7 +257,7 @@ class GetPostsController {
       res.json({ message: 'failed', error: error })
     }
   }
-  // ############################################################################################################
+
   static async feedPosts(req: Request, res: Response) {
     const userId = req.params.userId
 

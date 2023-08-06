@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import IAuth from './interfaces/auth.interface'
-import { checkPassword, checkUser, getUserPayload } from './check/login'
-import secret from '../validators'
-import { baseUrl } from '../utils/baseURL'
+import IAuth from '../../interfaces/auth.interface'
+import { checkPassword, checkUser, getUserPayload } from '../check/login'
+import secret from '../../validators'
+import { baseUrl } from '../../utils/baseURL'
 
 class LoginController {
   static async login(req: Request, res: Response) {
@@ -32,13 +32,13 @@ class LoginController {
       const isUsernameAvailable = await checkUser(username)
 
       if (!isUsernameAvailable) {
-        return res.json({ message: 'Username not found!' })
+        return res.json({ message: 'Wrong user or password combination' })
       }
 
       const isPasswordTrue = await checkPassword(username, password)
 
       if (!isPasswordTrue) {
-        return res.json({ message: 'Wrong password!' })
+        return res.json({ message: 'Wrong user or password combination!' })
       }
 
       const payload = await getUserPayload(username)

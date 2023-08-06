@@ -1,12 +1,8 @@
 export const apiPaths = {
   index: '/',
-
-
   login: '/api/auth/login',
   register: '/api/auth/register',
-
   getFeedPosts: '/api/user/get/feed/posts/:userId',
-
   getProfileAvatarImage: '/api/user/profile/img/avatar/:image',
   getProfileHeaderImage: '/api/user/profile/img/header/:image',
   getPostsImage: '/api/user/profile/posts/post/:image',

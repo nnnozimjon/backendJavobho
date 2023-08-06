@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
-import IAuth from './interfaces/auth.interface'
+import IAuth from '../../interfaces/auth.interface'
 import {
   checkEmailAvailability,
   checkUsernameAvailability,
   createUser,
-} from './check/UserExistance'
+} from '../check/UserExistance'
 
 class RegisterController {
   static async register(req: Request, res: Response) {
-    const { username, fullname, description, email, password }: IAuth.register =  
+    const { username, fullname, description, email, password }: IAuth.register =
       req.body
 
     if (!username || !email || !password) {
