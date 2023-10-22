@@ -1,4 +1,4 @@
-export const apiPaths = {
+const Api = {
   index: '/',
   login: '/api/auth/login',
   register: '/api/auth/register',
@@ -22,3 +22,5 @@ export const apiPaths = {
   bookmarkPost: '/api/user/post/bookmark/post',
   bookmarkDelete: '/api/user/post/bookmark/delete',
 }
+
+export default Api

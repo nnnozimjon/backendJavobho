@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^18.15.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "nodemon": "^2.0.21",
     "rimraf": "^4.4.0",
     "ts-node": "^10.9.1",
@@ -38,8 +38,10 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
     "moment-timezone": "^0.5.43",
-    "mysql": "^2.18.1",
-    "socket.io": "^4.6.1",
+    "mysql2": "^3.6.2",
+    "sequelize": "^6.33.0",
+    "sequelize-cli": "^6.6.1",
+    "sequelize-typescript": "^2.1.5",
     "uuid": "^9.0.0"
   }
 }
