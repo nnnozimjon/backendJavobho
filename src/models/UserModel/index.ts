@@ -20,12 +20,14 @@ UserModel.init(
     userId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      unique: true,
       autoIncrement: true,
       allowNull: false,
     },
     username: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      unique: true,
     },
     fullname: {
       type: DataTypes.STRING(255),

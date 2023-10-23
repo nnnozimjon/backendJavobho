@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize'
-import sequelize from '../../config/db/index'
+import sequelize from '../../config/db'
 
 class TagModel extends Model {
   public tagId!: number

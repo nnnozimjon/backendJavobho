@@ -56,7 +56,6 @@ export interface Post {
   reposterId: numOrNull
   reposterText: strOrNull
   createdAt: dateOrString
-  updatedAt: dateOrString
 }
 
 // likes model

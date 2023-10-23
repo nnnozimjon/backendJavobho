@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import IAuth from '../../interfaces/auth.interface'
 import { checkPassword, checkUser, getUserPayload } from '../check/login'
-import secret from '../../validators'
+import { userSecretKey } from '../../common/token'
 import { baseUrl } from '../../utils/baseURL'
 
 class LoginController {
@@ -49,7 +49,7 @@ class LoginController {
           avatar: `${baseUrl}/api/user/profile/img/avatar/${payload.avatar}`,
           splashImage: `${baseUrl}/api/user/profile/img/header/${payload.splashImage}`,
         },
-        secret,
+        userSecretKey,
         {
           expiresIn: '3d',
         }
