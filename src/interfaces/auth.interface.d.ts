@@ -3,18 +3,6 @@ declare namespace IAuth {
   type text = string
   type bool = boolean
 
-  // userId: int
-  //   username: text
-  //   fullname: text
-  //   description: text
-  // verified: bool
-  // avatar: text
-  // splashImage: text
-  // createdAt: text
-  //   email: text
-  // emailVerified: bool
-  //   password: text
-
   interface register {
     username: text
     fullname: text
@@ -24,7 +12,7 @@ declare namespace IAuth {
   }
 
   interface login {
-    username: text
+    email: text
     password: text
     robot: bool
   }

@@ -1,53 +1,55 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import IAuth from '../../interfaces/auth.interface'
-import { checkPassword, checkUser, getUserPayload } from '../check/login'
 import { userSecretKey } from '../../common/token'
 import { baseUrl } from '../../utils/baseURL'
+import ValidatorController from '../validators'
 
 class LoginController {
   static async login(req: Request, res: Response) {
-    const { username, password, robot }: IAuth.login = req.body
-
     try {
-      if (!username || !password) {
-        return res.json({
-          message:
-            'One of the following parameters is missing: username, password!',
+      const { email, password } = req.body
+      const requiredParams = {
+        email,
+        password,
+      }
+
+      const isRequiredParams =
+        ValidatorController.validateRequiredFields(requiredParams)
+
+      console.log(isRequiredParams)
+
+      if (!isRequiredParams.valid) {
+        return res.status(400).json({
+          code: 400,
+          message: 'Отсутствуют обязательные поля!',
         })
       }
 
-      if (!robot) {
-        return res.json({ message: 'Please verify you are human!' })
+      if (!ValidatorController.isValidEmail(email)) {
+        return res
+          .status(400)
+          .json({ code: 400, message: 'Неверный адрес электронной почты!' })
       }
 
-      if (username.length < 3) {
-        return res.json({ message: 'Username must be at least 3 characters!' })
+      const user: any = await ValidatorController.isUserCredentialCorrect(
+        res,
+        email,
+        password
+      )
+
+      if (!user) {
+        return res.status(400).json({
+          code: 400,
+          message: 'Неверные учетные данные!',
+        })
       }
 
-      if (password.length < 8) {
-        return res.json({ message: 'Password must be at least 8 characters!' })
-      }
-
-      const isUsernameAvailable = await checkUser(username)
-
-      if (!isUsernameAvailable) {
-        return res.json({ message: 'Wrong user or password combination' })
-      }
-
-      const isPasswordTrue = await checkPassword(username, password)
-
-      if (!isPasswordTrue) {
-        return res.json({ message: 'Wrong user or password combination!' })
-      }
-
-      const payload = await getUserPayload(username)
-
-      const token = jwt.sign(
+      const token = await jwt.sign(
         {
-          ...payload,
-          avatar: `${baseUrl}/api/user/profile/img/avatar/${payload.avatar}`,
-          splashImage: `${baseUrl}/api/user/profile/img/header/${payload.splashImage}`,
+          userId: user.userId,
+          userName: user.username,
+          email: user.email,
         },
         userSecretKey,
         {
@@ -55,13 +57,15 @@ class LoginController {
         }
       )
 
-      return res.json({
-        message: 'Success',
+      res.status(200).json({
+        code: 200,
         token,
       })
     } catch (error) {
-      console.error('Error during login:', error)
-      return res.status(500).json({ message: 'Internal server error.' })
+      res.status(500).json({
+        code: 500,
+        message: 'Внутренняя ошибка сервера!',
+      })
     }
   }
 }

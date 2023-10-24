@@ -1,12 +1,15 @@
 import express from 'express'
 import { RequestLimiter, PostRequestLimiter } from '../middleware/RateLimit'
-import PassportMiddleware from '../middleware'
 import Api from '../contants'
 import System from '../controllers'
 const Router = express.Router()
 
-Router.post(Api.login, RequestLimiter, System.LoginController.login)
-Router.post(Api.register, RequestLimiter, System.RegisterController.register)
+Router.post(Api.v1.auth.userLogin, RequestLimiter, System.LoginController.login)
+Router.post(
+  Api.v1.auth.userRegister,
+  RequestLimiter,
+  System.RegisterController.register
+)
 
 // Router.get(Api.getProfileAvatarImage, System.GetImageController.profile)
 // Router.get(Api.getProfileHeaderImage, System.GetImageController.header)

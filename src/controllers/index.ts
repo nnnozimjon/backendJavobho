@@ -1,5 +1,6 @@
 import LoginController from './auth/login'
 import RegisterController from './auth/register'
+import ValidatorController from './validators'
 import GetImageController from './post/getImage'
 import PostController from './post/postPost'
 import GetHashTagsController from './hashTags/getHashTags'
@@ -10,12 +11,13 @@ import UserController from './follow/user'
 const System = {
   LoginController,
   RegisterController,
-  GetFollowController,
-  GetImageController,
-  PostController,
-  GetHashTagsController,
-  GetPostsController,
-  UserController,
+  ValidatorController,
+  // GetFollowController,
+  // GetImageController,
+  // PostController,
+  // GetHashTagsController,
+  // GetPostsController,
+  // UserController,
 }
 
 export default System

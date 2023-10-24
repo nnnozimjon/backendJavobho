@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt'
 import fs from 'fs/promises'
 import path from 'path'
 import { userSecretKey } from '../../common/token'
-import { Op } from 'sequelize'
 
 class ValidatorController {
   static isValidEmail(email: any) {
